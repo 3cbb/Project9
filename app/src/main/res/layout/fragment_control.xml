@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/controlFragment"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    tools:context=".ControlFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:id="@+id/NowPlaying"
+        android:layout_width="323dp"
+        android:layout_height="wrap_content"
+        android:text="@string/now_playing" />
+
+    <TextView
+        android:id="@+id/timeRemaining"
+        android:layout_width="64dp"
+        android:layout_height="wrap_content"
+        android:text="@string/time_remaining"
+        android:translationX="350dp" />
+
+    <SeekBar
+        android:id="@+id/timeRemainingSeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:translationY="25dp" />
+
+    <ImageButton
+        android:id="@+id/playButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:drawable/ic_media_play"
+        android:translationX="115dp"
+        android:translationY="50dp"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <ImageButton
+        android:id="@+id/pauseButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:drawable/ic_media_pause"
+        android:translationX="175dp"
+        android:translationY="50dp" />
+
+    <ImageButton
+        android:id="@+id/stopButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/stopbutton"
+        android:translationX="235dp"
+        android:translationY="50dp" />
+
+</FrameLayout>
