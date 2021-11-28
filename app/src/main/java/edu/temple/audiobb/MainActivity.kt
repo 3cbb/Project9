@@ -1,16 +1,46 @@
 package edu.temple.audiobb
 
+import android.content.ComponentName
 import android.content.Intent
+import android.content.ServiceConnection
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.IBinder
+import android.os.Looper
 import android.view.View
 import android.widget.ImageButton
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
+import edu.temple.audlibplayer.PlayerService
 
 class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface {
 
     private lateinit var bookListFragment : BookListFragment
+    private lateinit var viewModel : PlayInfoViewModel
+
+    var isConnected = false
+
+    lateinit var mediaControlBinder : PlayerService.MediaControlBinder
+
+    val progressHandler = Handler(Looper.getMainLooper()) {
+        //viewModel.setPlayTime()
+        true
+    }
+
+
+    val serviceConnection = object: ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            isConnected = true
+            mediaControlBinder = service as PlayerService.MediaControlBinder
+            mediaControlBinder.setProgressHandler(progressHandler)
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            isConnected = false
+        }
+
+    }
 
     private val searchRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         supportFragmentManager.popBackStack()
@@ -40,6 +70,8 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        viewModel = ViewModelProvider(this).get(PlayInfoViewModel::class.java)
 
         // Grab test data
         //getBookList()
@@ -80,6 +112,19 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
             searchRequest.launch(Intent(this, SearchActivity::class.java))
         }
 
+        bindService(Intent(this, PlayerService::class.java)
+            , serviceConnection
+            , BIND_AUTO_CREATE
+        )
+
+        viewModel.getPlayInfo().observe(this, {
+            if(it == null){
+               mediaControlBinder.stop()
+            } else if(isConnected){
+                mediaControlBinder.play(it.id)
+            }
+        })
+
     }
 
     override fun onBackPressed() {
@@ -99,5 +144,10 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
                 .addToBackStack(null)
                 .commit()
         }
+    }
+
+    override fun onDestroy(){
+        super.onDestroy()
+        unbindService(serviceConnection)
     }
 }
